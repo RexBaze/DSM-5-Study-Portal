@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSM-5 Diagnostic Criteria Study Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <button class="hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="logo">DSM-5<span>STUDY PORTAL</span></div>
+  <div class="search-wrap">
+    <span class="si">&#9906;</span>
+    <input type="text" id="searchInput" placeholder="Search disorders, criteria, symptoms..." autocomplete="off" />
+  </div>
+  <div class="mode-wrap">
+    <span id="modeLeft">Reference</span>
+    <label class="toggle">
+      <input type="checkbox" id="studyToggle" />
+      <span class="tslider"></span>
+    </label>
+    <span id="modeRight">Study Mode</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn" onclick="showStats()">&#9723; Progress</button>
+    <button class="btn" onclick="showExport()">Export</button>
+    <button class="btn" onclick="showImport()">Import</button>
+  </div>
+</div>
+
+<!-- SIDEBAR OVERLAY (mobile tap-outside-to-close) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeDrawer()"></div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="content" id="content"></div>
+</div>
+
+<!-- QUIZ MODAL -->
+<div class="modal-overlay" id="quizModal" style="display:none">
+  <div class="modal" id="quizContent"></div>
+</div>
+
+<!-- STATS MODAL -->
+<div class="modal-overlay" id="statsModal" style="display:none" onclick="if(event.target===this)closeModal('statsModal')">
+  <div class="modal" id="statsContent"></div>
+</div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-overlay" id="exportModal" style="display:none" onclick="if(event.target===this)closeModal('exportModal')">
+  <div class="modal" id="exportContent"></div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="modal-overlay" id="importModal" style="display:none" onclick="if(event.target===this)closeModal('importModal')">
+  <div class="modal" id="importContent"></div>
+</div>
+
+<!-- FLASHCARD MODAL -->
+<div class="modal-overlay" id="flashcardModal" style="display:none">
+  <div class="modal fc-modal" id="flashcardContent"></div>
+</div>
+
+<!-- App scripts: load order matters (each file declares globals consumed by the next) -->
+<script src="./js/data.js"></script>
+<script src="./js/progress.js"></script>
+<script src="./js/render.js"></script>
+<script src="./js/quiz.js"></script>
+<script src="./js/flashcards.js"></script>
+<script src="./js/modals.js"></script>
+<script src="./js/app.js"></script>
+
+</body>
+</html>
