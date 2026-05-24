@@ -707,6 +707,61 @@ body {
 .ch-prog-fill { height: 100%; border-radius: 4px; transition: width 0.4s; }
 .ch-prog-pct { font-size: 13px; color: var(--muted); min-width: 32px; text-align: right; }
 
+/* Expandable chapter block in the Progress modal */
+.stats-ch-block { border-bottom: 1px solid var(--border); }
+.stats-ch-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0;
+  cursor: pointer;
+  user-select: none;
+}
+.stats-ch-row:hover .ch-prog-name { color: var(--accent); }
+.stats-ch-arr {
+  display: inline-block;
+  width: 10px;
+  font-size: 11px;
+  color: var(--muted);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+.stats-ch-block.open > .stats-ch-row .stats-ch-arr { transform: rotate(90deg); }
+.stats-ch-detail { display: none; padding: 2px 0 10px 22px; }
+.stats-ch-block.open > .stats-ch-detail { display: block; }
+.stats-d-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 5px 2px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.stats-d-row:hover { background: var(--accent-soft); }
+.stats-d-name { flex: 1; color: var(--text); }
+.stats-d-score {
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 58px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.stats-d-lbl {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  background: var(--border);
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-right: 4px;
+}
+
+/* Segmented progress bar (mastered + learning + attempted) */
+.ch-prog-bar.segmented { display: flex; }
+.ch-prog-seg { height: 100%; transition: width 0.4s; }
+.ch-prog-seg.mastered { background: var(--green); }
+.ch-prog-seg.learning { background: var(--yellow); }
+.ch-prog-seg.attempted { background: var(--red); }
+
 /* SEARCH RESULTS */
 .sr-item {
   background: var(--card); border: 1px solid var(--border);

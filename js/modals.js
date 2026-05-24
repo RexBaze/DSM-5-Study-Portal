@@ -7,9 +7,10 @@ function showStats() {
   const attempted = all.filter(d => prog[d.id]).length;
   const mastered = all.filter(d => Progress.badge(d.id) === 'mastered').length;
   const learning = all.filter(d => Progress.badge(d.id) === 'learning').length;
-  const totalAttempts = Object.values(prog).reduce((a, p) => a + (p.attempts || 0), 0);
+  const totalQuizAttempts = Object.values(prog).reduce((a, p) => a + (p.attempts || 0), 0);
+  const totalFlashAttempts = Object.values(prog).reduce((a, p) => a + ((p.flash && p.flash.attempts) || 0), 0);
   const modal = document.getElementById('statsContent');
-  modal.innerHTML = `
+  let html = `
     <div class="modal-hdr">
       <div class="modal-title">Progress Overview</div>
       <button class="modal-close" onclick="closeModal('statsModal')">&#10005;</button>
@@ -19,22 +20,52 @@ function showStats() {
       <div class="stat-card"><div class="stat-val yellow">${learning}</div><div class="stat-lbl">Learning</div></div>
       <div class="stat-card"><div class="stat-val">${all.length - attempted}</div><div class="stat-lbl">Not Started</div></div>
     </div>
-    <div class="sec-label">By Chapter</div>`;
+    <div class="sec-label">By Chapter <span style="font-size:11px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">· tap a row to expand</span></div>`;
   for (const ch of DSM5_DATA.chapters) {
     const total = ch.disorders.length;
-    const done = ch.disorders.filter(d => Progress.badge(d.id) === 'mastered').length;
-    const pct = total ? Math.round((done / total) * 100) : 0;
-    modal.innerHTML += `<div class="chapter-prog-row">
-      <span class="ch-prog-name" style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:50%;background:${ch.color};display:inline-block"></span>${ch.name}</span>
-      <div class="ch-prog-bar"><div class="ch-prog-fill" style="width:${pct}%;background:${ch.color}"></div></div>
-      <span class="ch-prog-pct">${done}/${total}</span>
-    </div>`;
+    const mCount = ch.disorders.filter(d => Progress.badge(d.id) === 'mastered').length;
+    const lCount = ch.disorders.filter(d => Progress.badge(d.id) === 'learning').length;
+    const aCount = ch.disorders.filter(d => Progress.badge(d.id) === 'attempted').length;
+    const mPct = total ? (mCount / total) * 100 : 0;
+    const lPct = total ? (lCount / total) * 100 : 0;
+    const aPct = total ? (aCount / total) * 100 : 0;
+    html += `<div class="stats-ch-block" data-chid="${ch.id}">
+      <div class="stats-ch-row" onclick="toggleStatsChapter('${ch.id}')">
+        <span class="stats-ch-arr">&#9656;</span>
+        <span class="ch-prog-name" style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:50%;background:${ch.color};display:inline-block"></span>${ch.name}</span>
+        <div class="ch-prog-bar segmented" title="${mCount} mastered · ${lCount} learning · ${aCount} attempted · ${total - mCount - lCount - aCount} not started">
+          <div class="ch-prog-seg mastered" style="width:${mPct}%"></div>
+          <div class="ch-prog-seg learning" style="width:${lPct}%"></div>
+          <div class="ch-prog-seg attempted" style="width:${aPct}%"></div>
+        </div>
+        <span class="ch-prog-pct">${mCount}/${total}</span>
+      </div>
+      <div class="stats-ch-detail">`;
+    for (const d of ch.disorders) {
+      const p = prog[d.id];
+      const badge = Progress.badge(d.id);
+      const quizBest = p && typeof p.bestScore === 'number' ? Math.round(p.bestScore * 100) + '%' : '—';
+      const flashBest = p && p.flash && typeof p.flash.bestScore === 'number' ? Math.round(p.flash.bestScore * 100) + '%' : '—';
+      html += `<div class="stats-d-row" onclick="selectDisorder('${d.id}');closeModal('statsModal');">
+        <span class="mbadge${badge ? ' ' + badge : ''}"></span>
+        <span class="stats-d-name">${d.name}</span>
+        <span class="stats-d-score" title="Quiz best score"><span class="stats-d-lbl">Q</span>${quizBest}</span>
+        <span class="stats-d-score" title="Flashcard best score"><span class="stats-d-lbl">F</span>${flashBest}</span>
+      </div>`;
+    }
+    html += `</div></div>`;
   }
-  modal.innerHTML += `<div style="margin-top:14px;font-size:11px;color:var(--muted)">Total quiz attempts: ${totalAttempts}</div>
+  html += `<div style="margin-top:14px;font-size:11px;color:var(--muted)">Total attempts — Quiz: ${totalQuizAttempts} · Flash: ${totalFlashAttempts}</div>
     <div style="margin-top:10px;display:flex;gap:8px">
       <button class="btn btn-danger" onclick="if(confirm('Reset all progress? This cannot be undone.')){Progress.resetAll();closeModal('statsModal');renderSidebar();renderContent();}">Reset All Progress</button>
     </div>`;
+  modal.innerHTML = html;
   document.getElementById('statsModal').style.display = 'flex';
+}
+
+function toggleStatsChapter(chId) {
+  const block = document.querySelector(`.stats-ch-block[data-chid="${chId}"]`);
+  if (block) block.classList.toggle('open');
 }
 
 // ============================================================
