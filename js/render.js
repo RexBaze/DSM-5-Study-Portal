@@ -189,6 +189,30 @@ function renderContent() {
     html += `</ul></div>`;
   }
 
+  // Medications (FDA-approved per DailyMed)
+  const meds = (typeof MEDICATIONS !== 'undefined') ? MEDICATIONS[d.id] : null;
+  if (meds) {
+    html += `<div class="sec-label">Common Medications</div>`;
+    html += `<div class="info-block full">`;
+    html += `<div class="med-disclaimer">Educational reference — FDA-approved indications only, per <a href="https://dailymed.nlm.nih.gov/dailymed/" target="_blank" rel="noopener">DailyMed</a>. Verify dosing and current labeling before clinical use.</div>`;
+    if (meds.note) {
+      html += `<div class="med-note">${meds.note}</div>`;
+    }
+    if (meds.classes && meds.classes.length) {
+      for (const cls of meds.classes) {
+        html += `<div class="med-class"><div class="med-class-name">${cls.name}</div><ul class="med-list">`;
+        for (const drug of cls.drugs) {
+          const brandStr = drug.brand && drug.brand.length
+            ? ` <span class="med-brand">(${drug.brand.join(', ')})</span>` : '';
+          const searchUrl = `https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=${encodeURIComponent(drug.generic)}&searchtype=all`;
+          html += `<li><span class="med-generic">${drug.generic}</span>${brandStr} <a href="${searchUrl}" target="_blank" rel="noopener" class="med-link" title="Open DailyMed search for ${escapeHtml(drug.generic)}" aria-label="DailyMed label">↗</a></li>`;
+        }
+        html += `</ul></div>`;
+      }
+    }
+    html += `</div>`;
+  }
+
   html += `</div>`;
   content.innerHTML = html;
   content.scrollTop = 0;
@@ -215,6 +239,20 @@ function renderSearch(query) {
             if (s.text.toLowerCase().includes(q)) {
               matches = true;
               if (!snippet) snippet = s.text.substring(0, 120) + '...';
+            }
+          }
+        }
+      }
+      // Match generic and brand medication names too
+      const meds = (typeof MEDICATIONS !== 'undefined') ? MEDICATIONS[d.id] : null;
+      if (meds && meds.classes) {
+        for (const cls of meds.classes) {
+          for (const drug of cls.drugs) {
+            const hit = drug.generic.toLowerCase().includes(q)
+              || (drug.brand && drug.brand.some(b => b.toLowerCase().includes(q)));
+            if (hit) {
+              matches = true;
+              if (!snippet) snippet = `${drug.generic}${drug.brand && drug.brand.length ? ' (' + drug.brand.join(', ') + ')' : ''} — ${cls.name}`;
             }
           }
         }

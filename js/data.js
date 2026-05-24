@@ -1164,6 +1164,308 @@ const FLASHCARDS_EXTRA = {
 };
 
 // ============================================================
+// MEDICATIONS
+// ============================================================
+// FDA-approved indications only (per DailyMed product labeling).
+// Each entry is either { classes: [...] } with one or more drug classes,
+// or { note: '...' } when no agent is FDA-approved for that disorder
+// (and a brief honest explanation is more useful than an empty section).
+// Sources: dailymed.nlm.nih.gov product labels.
+const MEDICATIONS = {
+  // ---- DEPRESSIVE ----
+  mdd: { classes: [
+    { name: 'SSRIs', drugs: [
+      { generic: 'fluoxetine', brand: ['Prozac', 'Sarafem'] },
+      { generic: 'sertraline', brand: ['Zoloft'] },
+      { generic: 'paroxetine', brand: ['Paxil', 'Paxil CR', 'Pexeva'] },
+      { generic: 'citalopram', brand: ['Celexa'] },
+      { generic: 'escitalopram', brand: ['Lexapro'] }
+    ]},
+    { name: 'SNRIs', drugs: [
+      { generic: 'venlafaxine', brand: ['Effexor', 'Effexor XR'] },
+      { generic: 'desvenlafaxine', brand: ['Pristiq'] },
+      { generic: 'duloxetine', brand: ['Cymbalta'] },
+      { generic: 'levomilnacipran', brand: ['Fetzima'] }
+    ]},
+    { name: 'Atypical antidepressants', drugs: [
+      { generic: 'bupropion', brand: ['Wellbutrin', 'Wellbutrin XL', 'Wellbutrin SR'] },
+      { generic: 'mirtazapine', brand: ['Remeron'] },
+      { generic: 'vilazodone', brand: ['Viibryd'] },
+      { generic: 'vortioxetine', brand: ['Trintellix'] },
+      { generic: 'trazodone', brand: ['Desyrel', 'Oleptro'] },
+      { generic: 'nefazodone', brand: ['Serzone'] }
+    ]},
+    { name: 'Tricyclics (TCAs)', drugs: [
+      { generic: 'amitriptyline', brand: ['Elavil'] },
+      { generic: 'nortriptyline', brand: ['Pamelor'] },
+      { generic: 'imipramine', brand: ['Tofranil'] },
+      { generic: 'desipramine', brand: ['Norpramin'] },
+      { generic: 'doxepin', brand: ['Sinequan'] },
+      { generic: 'protriptyline', brand: ['Vivactil'] },
+      { generic: 'trimipramine', brand: ['Surmontil'] }
+    ]},
+    { name: 'MAOIs', drugs: [
+      { generic: 'phenelzine', brand: ['Nardil'] },
+      { generic: 'tranylcypromine', brand: ['Parnate'] },
+      { generic: 'isocarboxazid', brand: ['Marplan'] },
+      { generic: 'selegiline transdermal', brand: ['Emsam'] }
+    ]},
+    { name: 'Atypical antipsychotic adjuncts', drugs: [
+      { generic: 'aripiprazole', brand: ['Abilify'] },
+      { generic: 'brexpiprazole', brand: ['Rexulti'] },
+      { generic: 'quetiapine XR', brand: ['Seroquel XR'] },
+      { generic: 'olanzapine + fluoxetine', brand: ['Symbyax'] }
+    ]},
+    { name: 'NMDA modulators (treatment-resistant)', drugs: [
+      { generic: 'esketamine intranasal', brand: ['Spravato'] }
+    ]}
+  ]},
+  pdd: {
+    note: 'No agents are FDA-approved specifically for Persistent Depressive Disorder. In practice, SSRIs and SNRIs approved for MDD are used; fluoxetine has the strongest controlled-trial evidence.',
+    classes: []
+  },
+  dmdd: {
+    note: 'No medications are FDA-approved specifically for DMDD. First-line treatment is psychosocial (parent management training, CBT). Stimulants for comorbid ADHD; SSRIs or risperidone occasionally used off-label for severe irritability or aggression.',
+    classes: []
+  },
+
+  // ---- BIPOLAR ----
+  bipolar1: { classes: [
+    { name: 'Lithium', drugs: [
+      { generic: 'lithium carbonate', brand: ['Lithobid', 'Eskalith'] }
+    ]},
+    { name: 'Anticonvulsant mood stabilizers', drugs: [
+      { generic: 'valproate / divalproex', brand: ['Depakote', 'Depakote ER', 'Depakene'] },
+      { generic: 'carbamazepine ER', brand: ['Equetro', 'Tegretol XR'] },
+      { generic: 'lamotrigine (maintenance)', brand: ['Lamictal'] }
+    ]},
+    { name: 'Atypical antipsychotics (acute mania / mixed)', drugs: [
+      { generic: 'olanzapine', brand: ['Zyprexa'] },
+      { generic: 'risperidone', brand: ['Risperdal', 'Risperdal Consta'] },
+      { generic: 'quetiapine', brand: ['Seroquel', 'Seroquel XR'] },
+      { generic: 'aripiprazole', brand: ['Abilify', 'Abilify Maintena'] },
+      { generic: 'ziprasidone', brand: ['Geodon'] },
+      { generic: 'asenapine', brand: ['Saphris'] },
+      { generic: 'cariprazine', brand: ['Vraylar'] }
+    ]},
+    { name: 'For bipolar I depression', drugs: [
+      { generic: 'quetiapine', brand: ['Seroquel', 'Seroquel XR'] },
+      { generic: 'lurasidone', brand: ['Latuda'] },
+      { generic: 'olanzapine + fluoxetine', brand: ['Symbyax'] },
+      { generic: 'cariprazine', brand: ['Vraylar'] },
+      { generic: 'lumateperone', brand: ['Caplyta'] }
+    ]}
+  ]},
+  bipolar2: { classes: [
+    { name: 'For bipolar II depression', drugs: [
+      { generic: 'quetiapine', brand: ['Seroquel', 'Seroquel XR'] },
+      { generic: 'lumateperone', brand: ['Caplyta'] }
+    ]},
+    { name: 'Maintenance / mood stabilizers', drugs: [
+      { generic: 'lithium carbonate', brand: ['Lithobid', 'Eskalith'] },
+      { generic: 'lamotrigine (maintenance)', brand: ['Lamictal'] }
+    ]}
+  ]},
+  cyclothymia: {
+    note: 'No medications are FDA-approved specifically for cyclothymic disorder. Mood stabilizers (lithium, lamotrigine, valproate) and second-generation antipsychotics used in bipolar I/II are applied off-label.',
+    classes: []
+  },
+
+  // ---- ANXIETY ----
+  gad: { classes: [
+    { name: 'SSRIs', drugs: [
+      { generic: 'paroxetine', brand: ['Paxil'] },
+      { generic: 'escitalopram', brand: ['Lexapro'] }
+    ]},
+    { name: 'SNRIs', drugs: [
+      { generic: 'venlafaxine ER', brand: ['Effexor XR'] },
+      { generic: 'duloxetine', brand: ['Cymbalta'] }
+    ]},
+    { name: 'Azapirone', drugs: [
+      { generic: 'buspirone', brand: ['Buspar'] }
+    ]},
+    { name: 'Benzodiazepines (short-term)', drugs: [
+      { generic: 'alprazolam', brand: ['Xanax', 'Xanax XR'] },
+      { generic: 'lorazepam', brand: ['Ativan'] },
+      { generic: 'diazepam', brand: ['Valium'] },
+      { generic: 'clonazepam', brand: ['Klonopin'] }
+    ]},
+    { name: 'Antihistamine', drugs: [
+      { generic: 'hydroxyzine', brand: ['Vistaril', 'Atarax'] }
+    ]}
+  ]},
+  panic: { classes: [
+    { name: 'SSRIs', drugs: [
+      { generic: 'fluoxetine', brand: ['Prozac'] },
+      { generic: 'sertraline', brand: ['Zoloft'] },
+      { generic: 'paroxetine', brand: ['Paxil', 'Paxil CR'] }
+    ]},
+    { name: 'SNRI', drugs: [
+      { generic: 'venlafaxine ER', brand: ['Effexor XR'] }
+    ]},
+    { name: 'Benzodiazepines', drugs: [
+      { generic: 'alprazolam', brand: ['Xanax', 'Xanax XR'] },
+      { generic: 'clonazepam', brand: ['Klonopin'] }
+    ]}
+  ]},
+  sad: { classes: [
+    { name: 'SSRIs', drugs: [
+      { generic: 'sertraline', brand: ['Zoloft'] },
+      { generic: 'paroxetine', brand: ['Paxil', 'Paxil CR'] },
+      { generic: 'fluvoxamine CR', brand: ['Luvox CR'] }
+    ]},
+    { name: 'SNRI', drugs: [
+      { generic: 'venlafaxine ER', brand: ['Effexor XR'] }
+    ]}
+  ]},
+  specific_phobia: {
+    note: 'No medications are FDA-approved for specific phobia. Exposure therapy is first-line. Benzodiazepines or beta-blockers (propranolol) are occasionally used short-term for situational phobias (e.g., flying).',
+    classes: []
+  },
+  agoraphobia: {
+    note: 'No agents are FDA-approved specifically for agoraphobia. SSRIs and SNRIs approved for panic disorder (which commonly co-occurs) are typically used.',
+    classes: []
+  },
+
+  // ---- OCD AND RELATED ----
+  ocd_dx: { classes: [
+    { name: 'SSRIs', drugs: [
+      { generic: 'fluoxetine', brand: ['Prozac'] },
+      { generic: 'sertraline', brand: ['Zoloft'] },
+      { generic: 'paroxetine', brand: ['Paxil'] },
+      { generic: 'fluvoxamine', brand: ['Luvox', 'Luvox CR'] }
+    ]},
+    { name: 'Tricyclic (gold-standard comparator)', drugs: [
+      { generic: 'clomipramine', brand: ['Anafranil'] }
+    ]}
+  ]},
+  bdd: {
+    note: 'No medications are FDA-approved specifically for body dysmorphic disorder. SSRIs (especially fluoxetine) and clomipramine are first-line in practice, supported by OCD-equivalent trial evidence.',
+    classes: []
+  },
+  hoarding: {
+    note: 'No medications are FDA-approved for hoarding disorder. CBT with exposure and response prevention is first-line. SSRIs used off-label show modest benefit, particularly when comorbid depression or OCD is present.',
+    classes: []
+  },
+
+  // ---- TRAUMA / STRESSOR-RELATED ----
+  ptsd: { classes: [
+    { name: 'SSRIs (FDA-approved for PTSD)', drugs: [
+      { generic: 'sertraline', brand: ['Zoloft'] },
+      { generic: 'paroxetine', brand: ['Paxil'] }
+    ]}
+  ]},
+  acute_stress: {
+    note: 'No medications are FDA-approved for Acute Stress Disorder. Short-term symptomatic treatment of hyperarousal or insomnia may be used; SSRIs are introduced if symptoms persist beyond 1 month and ASD transitions toward PTSD.',
+    classes: []
+  },
+
+  // ---- PSYCHOTIC ----
+  schizophrenia: { classes: [
+    { name: 'First-generation (typical) antipsychotics', drugs: [
+      { generic: 'haloperidol', brand: ['Haldol', 'Haldol Decanoate'] },
+      { generic: 'chlorpromazine', brand: ['Thorazine'] },
+      { generic: 'fluphenazine', brand: ['Prolixin', 'Prolixin Decanoate'] },
+      { generic: 'perphenazine', brand: ['Trilafon'] },
+      { generic: 'thiothixene', brand: ['Navane'] },
+      { generic: 'loxapine', brand: ['Loxitane', 'Adasuve'] },
+      { generic: 'trifluoperazine', brand: ['Stelazine'] }
+    ]},
+    { name: 'Second-generation (atypical) antipsychotics', drugs: [
+      { generic: 'risperidone', brand: ['Risperdal', 'Risperdal Consta'] },
+      { generic: 'paliperidone', brand: ['Invega', 'Invega Sustenna', 'Invega Trinza'] },
+      { generic: 'olanzapine', brand: ['Zyprexa', 'Zyprexa Relprevv'] },
+      { generic: 'quetiapine', brand: ['Seroquel', 'Seroquel XR'] },
+      { generic: 'aripiprazole', brand: ['Abilify', 'Abilify Maintena', 'Aristada'] },
+      { generic: 'ziprasidone', brand: ['Geodon'] },
+      { generic: 'asenapine', brand: ['Saphris'] },
+      { generic: 'lurasidone', brand: ['Latuda'] },
+      { generic: 'iloperidone', brand: ['Fanapt'] },
+      { generic: 'brexpiprazole', brand: ['Rexulti'] },
+      { generic: 'cariprazine', brand: ['Vraylar'] },
+      { generic: 'lumateperone', brand: ['Caplyta'] }
+    ]},
+    { name: 'For treatment-resistant schizophrenia', drugs: [
+      { generic: 'clozapine', brand: ['Clozaril', 'Versacloz', 'FazaClo'] }
+    ]}
+  ]},
+  schizoaffective: { classes: [
+    { name: 'FDA-approved for schizoaffective disorder', drugs: [
+      { generic: 'paliperidone', brand: ['Invega', 'Invega Sustenna'] }
+    ]},
+    { name: 'Other antipsychotics commonly used', drugs: [
+      { generic: 'risperidone', brand: ['Risperdal'] },
+      { generic: 'olanzapine', brand: ['Zyprexa'] },
+      { generic: 'aripiprazole', brand: ['Abilify'] },
+      { generic: 'quetiapine', brand: ['Seroquel', 'Seroquel XR'] }
+    ]}
+  ]},
+  delusional: {
+    note: 'No medications are FDA-approved specifically for delusional disorder. Second-generation antipsychotics (risperidone, olanzapine) are used off-label with modest evidence; the somatic subtype may respond preferentially to pimozide.',
+    classes: []
+  },
+
+  // ---- PERSONALITY DISORDERS ----
+  bpd: {
+    note: 'No medications are FDA-approved for borderline personality disorder. Psychotherapy is first-line (DBT, mentalization-based, transference-focused). SSRIs, mood stabilizers, and second-generation antipsychotics are used symptomatically off-label.',
+    classes: []
+  },
+  npd: { note: 'No medications are FDA-approved for narcissistic personality disorder. Treatment is psychotherapy; pharmacotherapy targets comorbid mood or anxiety disorders only.', classes: [] },
+  aspd: { note: 'No medications are FDA-approved for antisocial personality disorder. Treatment is psychosocial; pharmacotherapy targets comorbid conditions only.', classes: [] },
+  paranoid_pd: { note: 'No medications are FDA-approved for paranoid personality disorder. Supportive psychotherapy; low-dose antipsychotics off-label for transient paranoid intensification.', classes: [] },
+  schizoid_pd: { note: 'No medications are FDA-approved for schizoid personality disorder. Supportive psychotherapy is primary.', classes: [] },
+  schizotypal_pd: { note: 'No medications are FDA-approved for schizotypal personality disorder. Low-dose second-generation antipsychotics used off-label; SSRIs for anxious/depressive features.', classes: [] },
+  histrionic_pd: { note: 'No medications are FDA-approved for histrionic personality disorder. Psychotherapy is primary.', classes: [] },
+  avoidant_pd: { note: 'No medications are FDA-approved for avoidant personality disorder. SSRIs and SNRIs approved for social anxiety disorder are used off-label for the overlapping symptom profile.', classes: [] },
+  dependent_pd: { note: 'No medications are FDA-approved for dependent personality disorder. Psychotherapy is primary; pharmacotherapy targets comorbid anxiety or depression.', classes: [] },
+  ocpd: { note: 'No medications are FDA-approved for obsessive-compulsive personality disorder (distinct from OCD). Psychotherapy is primary.', classes: [] },
+
+  // ---- NEURODEVELOPMENTAL ----
+  adhd: { classes: [
+    { name: 'Methylphenidate-class stimulants', drugs: [
+      { generic: 'methylphenidate IR', brand: ['Ritalin', 'Methylin'] },
+      { generic: 'methylphenidate ER / LA / OROS', brand: ['Concerta', 'Ritalin LA', 'Metadate CD', 'Quillivant XR', 'Aptensio XR'] },
+      { generic: 'methylphenidate patch', brand: ['Daytrana'] },
+      { generic: 'dexmethylphenidate', brand: ['Focalin', 'Focalin XR'] },
+      { generic: 'serdexmethylphenidate + dexmethylphenidate', brand: ['Azstarys'] }
+    ]},
+    { name: 'Amphetamine-class stimulants', drugs: [
+      { generic: 'mixed amphetamine salts', brand: ['Adderall', 'Adderall XR', 'Mydayis'] },
+      { generic: 'dextroamphetamine', brand: ['Dexedrine', 'ProCentra', 'Zenzedi'] },
+      { generic: 'lisdexamfetamine', brand: ['Vyvanse'] }
+    ]},
+    { name: 'Non-stimulants', drugs: [
+      { generic: 'atomoxetine', brand: ['Strattera'] },
+      { generic: 'viloxazine ER', brand: ['Qelbree'] },
+      { generic: 'guanfacine ER', brand: ['Intuniv'] },
+      { generic: 'clonidine ER', brand: ['Kapvay'] }
+    ]}
+  ]},
+  asd: { classes: [
+    { name: 'For irritability associated with autistic disorder (FDA-approved)', drugs: [
+      { generic: 'risperidone', brand: ['Risperdal'] },
+      { generic: 'aripiprazole', brand: ['Abilify'] }
+    ]}
+  ]},
+
+  // ---- EATING DISORDERS ----
+  anorexia: {
+    note: 'No medications are FDA-approved for anorexia nervosa. Nutritional rehabilitation and psychotherapy (CBT-E, family-based therapy for adolescents) are primary. Olanzapine has modest evidence for weight gain off-label.',
+    classes: []
+  },
+  bulimia: { classes: [
+    { name: 'SSRI (FDA-approved for bulimia nervosa)', drugs: [
+      { generic: 'fluoxetine', brand: ['Prozac'] }
+    ]}
+  ]},
+  bed: { classes: [
+    { name: 'FDA-approved for moderate-to-severe BED', drugs: [
+      { generic: 'lisdexamfetamine', brand: ['Vyvanse'] }
+    ]}
+  ]}
+};
+
+// ============================================================
 // DATA ACCESSORS
 // ============================================================
 function allDisorders() {
