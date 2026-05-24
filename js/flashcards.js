@@ -106,6 +106,28 @@ function renderFlashcard() {
     const review = Object.values(fs.marks).filter(m => m === 'review').length;
     const unrated = fs.deck.length - knew - review;
     const pct = fs.deck.length ? Math.round((knew / fs.deck.length) * 100) : 0;
+
+    // Record best score on full-deck runs only. Review-only sessions cover a
+    // biased subset and would inflate the best, so they don't count.
+    const prevFlash = Progress.getFlash(fs.disorder.id);
+    const prevBestPct = prevFlash ? Math.round(prevFlash.bestScore * 100) : null;
+    if (!fs.reviewOnly && !fs.scoreSaved && fs.deck.length > 0) {
+      Progress.recordFlashcard(fs.disorder.id, knew, fs.deck.length);
+      fs.scoreSaved = true;
+    }
+    const flashAfter = Progress.getFlash(fs.disorder.id);
+    const bestPct = flashAfter ? Math.round(flashAfter.bestScore * 100) : null;
+    const isNewBest = !fs.reviewOnly && fs.scoreSaved && bestPct !== null && (prevBestPct === null || pct > prevBestPct);
+
+    let bestLine = '';
+    if (fs.reviewOnly) {
+      bestLine = `<div style="font-size:12px;color:var(--muted);margin-top:6px">Review session — best score not updated</div>`;
+    } else if (isNewBest) {
+      bestLine = `<div style="font-size:13px;color:var(--green);margin-top:6px;font-weight:600">&#9733; New best score!</div>`;
+    } else if (bestPct !== null) {
+      bestLine = `<div style="font-size:12px;color:var(--muted);margin-top:6px">Best: ${bestPct}%</div>`;
+    }
+
     modal.innerHTML = `
       <div class="modal-hdr">
         <div class="modal-title">Deck Complete</div>
@@ -114,6 +136,7 @@ function renderFlashcard() {
       <div class="fc-summary">
         <div class="fc-sum-num">${pct}%</div>
         <div style="font-size:12px;color:var(--muted);margin-top:4px">${fs.disorder.name}</div>
+        ${bestLine}
         <div class="fc-sum-row">
           <div class="fc-sum-item"><div class="n" style="color:var(--green)">${knew}</div><div class="l">Knew</div></div>
           <div class="fc-sum-item"><div class="n" style="color:var(--red)">${review}</div><div class="l">Review</div></div>

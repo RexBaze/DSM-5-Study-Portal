@@ -110,6 +110,15 @@ function renderContent() {
   const badge = Progress.badge(d.id);
   const scoreClass = badge === 'mastered' ? 'green' : badge === 'learning' ? 'yellow' : badge === 'attempted' ? 'red' : 'none';
   const scoreText = prog ? Math.round(prog.bestScore * 100) + '%' : '--';
+  const flashProg = Progress.getFlash(d.id);
+  const flashScore = flashProg ? flashProg.bestScore : 0;
+  const flashClass = !flashProg ? 'none' : flashScore >= 0.85 ? 'green' : flashScore >= 0.60 ? 'yellow' : 'red';
+  const flashText = flashProg ? Math.round(flashScore * 100) + '%' : '--';
+  const lastDate = (() => {
+    const dates = [prog && prog.lastDate, flashProg && flashProg.lastDate].filter(Boolean);
+    if (!dates.length) return null;
+    return dates.sort().pop();
+  })();
 
   let html = `<div class="disorder-card">
     <div class="dcard-top">
@@ -126,16 +135,19 @@ function renderContent() {
         ${state.studyMode ? `<button class="btn" onclick="revealAll()">Reveal All</button>` : ''}
         <button class="btn" onclick="startFlashcards('${d.id}')">&#9783; Flash Cards</button>
         <button class="btn btn-primary" onclick="startQuiz('${d.id}')">Quiz Me</button>
-        ${prog ? `<button class="btn btn-danger" onclick="resetDisorder('${d.id}')">Reset</button>` : ''}
+        ${prog || flashProg ? `<button class="btn btn-danger" onclick="resetDisorder('${d.id}')">Reset</button>` : ''}
       </div>
     </div>`;
 
   // Mastery bar
   html += `<div class="mastery-row">
-    <span class="mastery-label">Best Score</span>
+    <span class="mastery-label">Quiz Best</span>
     <span class="mastery-score ${scoreClass}">${scoreText}</span>
     <span class="mastery-sep">|</span>
-    <span class="mastery-detail">${prog ? `Last attempt: ${new Date(prog.lastDate).toLocaleDateString()}` : 'Not yet attempted'}</span>
+    <span class="mastery-label">Flash Best</span>
+    <span class="mastery-score ${flashClass}">${flashText}</span>
+    <span class="mastery-sep">|</span>
+    <span class="mastery-detail">${lastDate ? `Last attempt: ${new Date(lastDate).toLocaleDateString()}` : 'Not yet attempted'}</span>
     ${state.studyMode ? '<span class="mastery-sep">|</span><span class="mastery-detail" style="color:var(--accent)">&#9670; Study Mode Active</span>' : ''}
   </div>`;
 
