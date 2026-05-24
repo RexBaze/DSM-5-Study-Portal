@@ -82,8 +82,10 @@ function init() {
     if (e.target === this) closeFlashcards();
   });
 
-  // Drive sync (no-op if Client ID not configured)
-  if (window.Drive) {
+  // Drive sync (no-op if Client ID not configured).
+  // `Drive` is declared with `const` in drive.js so it's in the global lexical
+  // env but not on `window` — check with typeof instead of window.Drive.
+  if (typeof Drive !== 'undefined') {
     Drive.init();
     window.addEventListener('beforeunload', () => Drive.flushOnUnload());
   }

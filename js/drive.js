@@ -329,6 +329,8 @@ const Drive = {
       btn.textContent = signedIn ? 'Sign out' : 'Sign in';
       btn.onclick = signedIn ? () => this.signOut() : () => this.signIn();
       btn.disabled = (kind === 'disabled' || kind === 'loading');
+      // Hide the button entirely when Drive is disabled (no Client ID) or still loading
+      btn.style.display = (kind === 'disabled' || kind === 'loading') ? 'none' : '';
       if (kind === 'disabled') btn.title = 'Drive sync not configured';
       else btn.removeAttribute('title');
     });

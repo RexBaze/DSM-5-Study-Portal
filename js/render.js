@@ -67,7 +67,7 @@ function renderSidebar() {
   } else {
     sidebar.innerHTML = inner;
   }
-  if (window.Drive && typeof Drive.refreshUI === 'function') Drive.refreshUI();
+  if (typeof Drive !== 'undefined' && typeof Drive.refreshUI === 'function') Drive.refreshUI();
 }
 
 function toggleChapter(chId) {
