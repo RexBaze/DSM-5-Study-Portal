@@ -40,13 +40,36 @@ const Progress = {
     const data = this.load();
     const prev = data[disorderId] || { attempts: 0, bestScore: 0 };
     data[disorderId] = {
-      attempts: prev.attempts + 1,
+      ...prev,
+      attempts: (prev.attempts || 0) + 1,
       lastScore: score,
       bestScore: Math.max(prev.bestScore || 0, score),
       total,
       lastDate: new Date().toISOString()
     };
     this.save(data);
+  },
+  // Flashcard best-score is nested under `flash` so quiz fields remain
+  // untouched and existing exported snapshots stay valid.
+  recordFlashcard(disorderId, knew, total) {
+    if (!total) return;
+    const data = this.load();
+    const entry = data[disorderId] || {};
+    const prev = entry.flash || { attempts: 0, bestScore: 0 };
+    const score = knew / total;
+    entry.flash = {
+      attempts: (prev.attempts || 0) + 1,
+      lastScore: score,
+      bestScore: Math.max(prev.bestScore || 0, score),
+      total,
+      lastDate: new Date().toISOString()
+    };
+    data[disorderId] = entry;
+    this.save(data);
+  },
+  getFlash(disorderId) {
+    const p = this.load()[disorderId];
+    return p && p.flash ? p.flash : null;
   },
   reset(disorderId) {
     const data = this.load();
