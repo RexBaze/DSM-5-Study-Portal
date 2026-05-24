@@ -1,3 +1,14 @@
+// Splits a multi-sentence string into individual sentences for bullet rendering.
+// Lookahead on `period + whitespace + capital letter` avoids breaking on
+// abbreviations like "e.g.," and "i.e.," which are followed by a comma.
+function bulletize(text) {
+  if (!text) return [];
+  return text.split(/\.\s+(?=[A-Z])/)
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(s => s.endsWith('.') ? s : s + '.');
+}
+
 // ============================================================
 // SIDEBAR
 // ============================================================
@@ -150,11 +161,19 @@ function renderContent() {
     html += `</div>`;
   }
 
-  // Duration & Exclusions
+  // Duration & Exclusions — bullet-pointed
   if (d.duration || d.exclusions) {
     html += `<div class="sec-label">Clinical Notes</div><div class="info-grid">`;
-    if (d.duration) html += `<div class="info-block"><div class="ibtitle">Duration / Timeframe</div><div class="ibtext">${d.duration}</div></div>`;
-    if (d.exclusions) html += `<div class="info-block${!d.duration ? ' full' : ''}"><div class="ibtitle">Exclusions / Differentials</div><div class="ibtext">${d.exclusions}</div></div>`;
+    if (d.duration) {
+      html += `<div class="info-block"><div class="ibtitle">Duration / Timeframe</div><ul class="iblist">`;
+      for (const s of bulletize(d.duration)) html += `<li>${s}</li>`;
+      html += `</ul></div>`;
+    }
+    if (d.exclusions) {
+      html += `<div class="info-block${!d.duration ? ' full' : ''}"><div class="ibtitle">Exclusions / Differentials</div><ul class="iblist">`;
+      for (const s of bulletize(d.exclusions)) html += `<li>${s}</li>`;
+      html += `</ul></div>`;
+    }
     html += `</div>`;
   }
 
