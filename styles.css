@@ -117,6 +117,33 @@ body {
 .btn-danger { border-color: var(--red); color: var(--red); }
 .btn-danger:hover { background: rgba(224,82,82,0.1); }
 
+/* DRIVE SYNC STATUS PILL */
+.drive-status {
+  font-size: 10px;
+  color: var(--muted);
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  align-self: center;
+}
+.drive-status::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border2);
+  flex-shrink: 0;
+}
+.drive-status[data-kind="synced"]::before { background: var(--green); }
+.drive-status[data-kind="syncing"]::before,
+.drive-status[data-kind="pending"]::before { background: var(--yellow); }
+.drive-status[data-kind="error"]::before { background: var(--red); }
+.drive-status[data-kind="signed_out"] { display: none; }
+.drive-status[data-kind="disabled"] { display: none; }
+
 /* LAYOUT */
 .main { display: flex; flex: 1; overflow: hidden; }
 

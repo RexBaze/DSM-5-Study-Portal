@@ -6,6 +6,8 @@
 <title>DSM-5 Diagnostic Criteria Study Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./styles.css">
+<!-- Google Identity Services for OAuth (Drive sync). Loads async; drive.js polls for readiness. -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -28,6 +30,8 @@
     <span id="modeRight">Study Mode</span>
   </div>
   <div class="topbar-right">
+    <span class="drive-status" data-kind="loading">Loading…</span>
+    <button class="btn drive-sign-btn" disabled>Sign in</button>
     <button class="btn" onclick="showStats()">&#9723; Progress</button>
     <button class="btn" onclick="showExport()">Export</button>
     <button class="btn" onclick="showImport()">Import</button>
@@ -71,6 +75,7 @@
 <!-- App scripts: load order matters (each file declares globals consumed by the next) -->
 <script src="./js/data.js"></script>
 <script src="./js/progress.js"></script>
+<script src="./js/drive.js"></script>
 <script src="./js/render.js"></script>
 <script src="./js/quiz.js"></script>
 <script src="./js/flashcards.js"></script>

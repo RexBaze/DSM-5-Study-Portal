@@ -56,6 +56,10 @@ function renderSidebar() {
         </div>
       </div>
       <div class="sidebar-footer">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="drive-status" data-kind="loading" style="flex:1">Loading…</span>
+          <button class="btn drive-sign-btn" disabled>Sign in</button>
+        </div>
         <button class="btn" onclick="showStats();closeDrawer()">&#9723; Progress</button>
         <button class="btn" onclick="showExport();closeDrawer()">Export Progress</button>
         <button class="btn" onclick="showImport();closeDrawer()">Import Progress</button>
@@ -63,6 +67,7 @@ function renderSidebar() {
   } else {
     sidebar.innerHTML = inner;
   }
+  if (window.Drive && typeof Drive.refreshUI === 'function') Drive.refreshUI();
 }
 
 function toggleChapter(chId) {

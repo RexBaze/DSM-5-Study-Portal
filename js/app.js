@@ -81,6 +81,12 @@ function init() {
   document.getElementById('flashcardModal').addEventListener('click', function(e) {
     if (e.target === this) closeFlashcards();
   });
+
+  // Drive sync (no-op if Client ID not configured)
+  if (window.Drive) {
+    Drive.init();
+    window.addEventListener('beforeunload', () => Drive.flushOnUnload());
+  }
 }
 
 init();
