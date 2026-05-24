@@ -6,6 +6,7 @@ function selectDisorder(id) {
   state.searchQuery = '';
   state.revealed = new Set();
   document.getElementById('searchInput').value = '';
+  saveView();
 
   // Auto-open chapter
   const ch = findChapterForDisorder(id);
@@ -29,9 +30,52 @@ function resetDisorder(id) {
 }
 
 // ============================================================
+// VIEW STATE PERSISTENCE (survives reload)
+// ============================================================
+// Stores `{activeId, studyMode}` in localStorage. Restored in init().
+const VIEW_KEY = 'dsm5_view_state';
+function saveView() {
+  try {
+    localStorage.setItem(VIEW_KEY, JSON.stringify({
+      activeId: state.activeId,
+      studyMode: state.studyMode
+    }));
+  } catch (e) {}
+}
+function loadView() {
+  try {
+    const raw = localStorage.getItem(VIEW_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
+}
+
+// ============================================================
+// THEME
+// ============================================================
+function applyTheme(theme) {
+  if (theme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
+  try { localStorage.setItem('dsm5_theme', theme); } catch (e) {}
+}
+function currentTheme() {
+  return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+}
+
+// ============================================================
 // INIT
 // ============================================================
 function init() {
+  // Restore last-viewed disorder + study mode BEFORE the first render
+  const saved = loadView();
+  if (saved && typeof saved === 'object') {
+    if (saved.activeId && findDisorder(saved.activeId)) state.activeId = saved.activeId;
+    if (typeof saved.studyMode === 'boolean') state.studyMode = saved.studyMode;
+  }
+
   renderSidebar();
   renderContent();
 
@@ -51,17 +95,30 @@ function init() {
   });
 
   // Desktop study mode toggle
-  document.getElementById('studyToggle').addEventListener('change', function() {
+  const studyToggleEl = document.getElementById('studyToggle');
+  studyToggleEl.checked = state.studyMode;
+  studyToggleEl.addEventListener('change', function() {
     state.studyMode = this.checked;
     state.revealed = new Set();
+    saveView();
     document.getElementById('modeLeft').classList.toggle('mode-label-active', !state.studyMode);
     document.getElementById('modeRight').classList.toggle('mode-label-active', state.studyMode);
     renderContent();
     renderSidebar(); // re-render so mobile toggle stays in sync
   });
 
+  // Theme toggle (light <-> dark)
+  const themeToggleEl = document.getElementById('themeToggle');
+  themeToggleEl.checked = currentTheme() === 'dark';
+  themeToggleEl.addEventListener('change', function() {
+    applyTheme(this.checked ? 'dark' : 'light');
+    // Re-render sidebar so the mobile drawer mirror checkbox stays in sync
+    renderSidebar();
+  });
+
   // Initialize mode label
-  document.getElementById('modeLeft').classList.add('mode-label-active');
+  document.getElementById('modeLeft').classList.toggle('mode-label-active', !state.studyMode);
+  document.getElementById('modeRight').classList.toggle('mode-label-active', state.studyMode);
 
   // Re-render sidebar on window resize so layout switches cleanly
   let resizeTimer;

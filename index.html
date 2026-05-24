@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DSM-5 Diagnostic Criteria Study Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Apply persisted theme before stylesheet renders to avoid flash of wrong theme -->
+<script>
+  (function(){
+    try {
+      var t = localStorage.getItem('dsm5_theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    } catch(e) {}
+  })();
+</script>
 <link rel="stylesheet" href="./styles.css">
 <!-- Google Identity Services for OAuth (Drive sync). Loads async; drive.js polls for readiness. -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -28,6 +37,14 @@
       <span class="tslider"></span>
     </label>
     <span id="modeRight">Study Mode</span>
+  </div>
+  <div class="mode-wrap theme-wrap" title="Toggle light / dark theme">
+    <span style="font-size:15px" aria-hidden="true">☀</span>
+    <label class="toggle">
+      <input type="checkbox" id="themeToggle" aria-label="Toggle dark theme" />
+      <span class="tslider"></span>
+    </label>
+    <span style="font-size:15px" aria-hidden="true">☾</span>
   </div>
   <div class="topbar-right">
     <span class="drive-status" data-kind="loading">Loading…</span>

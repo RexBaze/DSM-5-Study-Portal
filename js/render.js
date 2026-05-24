@@ -42,17 +42,29 @@ function renderSidebar() {
   if (isMobile) {
     const modeL = !state.studyMode ? 'color:var(--text);font-weight:500' : '';
     const modeR = state.studyMode ? 'color:var(--text);font-weight:500' : '';
+    const isDark = (typeof currentTheme === 'function' && currentTheme() === 'dark');
     sidebar.innerHTML = `
       <div class="sidebar-scroll">${inner}</div>
       <div class="mobile-mode-wrap">
         <span>Study Mode</span>
         <div class="mobile-mode-inner">
-          <span style="font-size:11px;${modeL}">Reference</span>
+          <span style="font-size:13px;${modeL}">Reference</span>
           <label class="toggle">
             <input type="checkbox" id="studyToggleMobile" ${state.studyMode ? 'checked' : ''} onchange="mobileToggleStudy(this)" />
             <span class="tslider"></span>
           </label>
-          <span style="font-size:11px;${modeR}">Study</span>
+          <span style="font-size:13px;${modeR}">Study</span>
+        </div>
+      </div>
+      <div class="mobile-mode-wrap">
+        <span>Theme</span>
+        <div class="mobile-mode-inner">
+          <span style="font-size:15px" aria-hidden="true">☀</span>
+          <label class="toggle">
+            <input type="checkbox" id="themeToggleMobile" ${isDark ? 'checked' : ''} onchange="mobileToggleTheme(this)" />
+            <span class="tslider"></span>
+          </label>
+          <span style="font-size:15px" aria-hidden="true">☾</span>
         </div>
       </div>
       <div class="sidebar-footer">
@@ -200,19 +212,21 @@ function renderContent() {
     }
     if (meds.classes && meds.classes.length) {
       for (const cls of meds.classes) {
-        html += `<div class="med-class"><div class="med-class-name">${cls.name}</div><ul class="med-list">`;
+        html += `<div class="med-class">`
+          + `<div class="med-class-name">${cls.name}</div>`
+          + `<table class="med-table">`
+          + `<thead><tr><th>Generic</th><th>Brand</th><th aria-label="Source"></th></tr></thead>`
+          + `<tbody>`;
         for (const drug of cls.drugs) {
           const searchUrl = `https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=${encodeURIComponent(drug.generic)}&searchtype=all`;
-          const hasBrand = drug.brand && drug.brand.length;
-          html += `<li>`
-            + `<span class="med-tag">Generic</span><span class="med-generic">${drug.generic}</span>`
-            + (hasBrand
-                ? `<span class="med-sep">·</span><span class="med-tag">Brand</span><span class="med-brand">${drug.brand.join(', ')}</span>`
-                : '')
-            + ` <a href="${searchUrl}" target="_blank" rel="noopener" class="med-link" title="Open DailyMed search for ${escapeHtml(drug.generic)}" aria-label="DailyMed label">↗</a>`
-            + `</li>`;
+          const brandStr = drug.brand && drug.brand.length ? drug.brand.join(', ') : '—';
+          html += `<tr>`
+            + `<td class="med-col-generic">${drug.generic}</td>`
+            + `<td class="med-col-brand">${brandStr}</td>`
+            + `<td class="med-col-link"><a href="${searchUrl}" target="_blank" rel="noopener" class="med-link" title="Open DailyMed search for ${escapeHtml(drug.generic)}" aria-label="DailyMed label">↗</a></td>`
+            + `</tr>`;
         }
-        html += `</ul></div>`;
+        html += `</tbody></table></div>`;
       }
     }
     html += `</div>`;

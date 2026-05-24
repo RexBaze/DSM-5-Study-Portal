@@ -115,10 +115,18 @@ function closeDrawer() {
 function mobileToggleStudy(el) {
   state.studyMode = el.checked;
   state.revealed = new Set();
+  if (typeof saveView === 'function') saveView();
   // Sync the desktop toggle too
   const desktopToggle = document.getElementById('studyToggle');
   if (desktopToggle) desktopToggle.checked = state.studyMode;
   document.getElementById('modeLeft').classList.toggle('mode-label-active', !state.studyMode);
   document.getElementById('modeRight').classList.toggle('mode-label-active', state.studyMode);
   renderContent();
+}
+
+function mobileToggleTheme(el) {
+  if (typeof applyTheme === 'function') applyTheme(el.checked ? 'dark' : 'light');
+  // Sync the desktop toggle if visible
+  const desktopThemeToggle = document.getElementById('themeToggle');
+  if (desktopThemeToggle) desktopThemeToggle.checked = el.checked;
 }
