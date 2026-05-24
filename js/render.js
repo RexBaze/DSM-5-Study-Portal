@@ -202,10 +202,15 @@ function renderContent() {
       for (const cls of meds.classes) {
         html += `<div class="med-class"><div class="med-class-name">${cls.name}</div><ul class="med-list">`;
         for (const drug of cls.drugs) {
-          const brandStr = drug.brand && drug.brand.length
-            ? ` <span class="med-brand">(${drug.brand.join(', ')})</span>` : '';
           const searchUrl = `https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=${encodeURIComponent(drug.generic)}&searchtype=all`;
-          html += `<li><span class="med-generic">${drug.generic}</span>${brandStr} <a href="${searchUrl}" target="_blank" rel="noopener" class="med-link" title="Open DailyMed search for ${escapeHtml(drug.generic)}" aria-label="DailyMed label">↗</a></li>`;
+          const hasBrand = drug.brand && drug.brand.length;
+          html += `<li>`
+            + `<span class="med-tag">Generic</span><span class="med-generic">${drug.generic}</span>`
+            + (hasBrand
+                ? `<span class="med-sep">·</span><span class="med-tag">Brand</span><span class="med-brand">${drug.brand.join(', ')}</span>`
+                : '')
+            + ` <a href="${searchUrl}" target="_blank" rel="noopener" class="med-link" title="Open DailyMed search for ${escapeHtml(drug.generic)}" aria-label="DailyMed label">↗</a>`
+            + `</li>`;
         }
         html += `</ul></div>`;
       }

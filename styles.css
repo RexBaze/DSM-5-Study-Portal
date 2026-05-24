@@ -365,8 +365,21 @@ body {
   flex-wrap: wrap;
 }
 .med-list li::before { content: '•'; color: var(--border2); flex-shrink: 0; }
-.med-generic { font-weight: 500; }
-.med-brand { color: var(--muted); font-size: 11px; }
+.med-tag {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+.med-generic { font-weight: 500; color: var(--text); }
+.med-brand { color: var(--muted); font-size: 12px; }
+.med-sep { color: var(--border2); margin: 0 2px; }
 .med-link {
   color: var(--muted);
   text-decoration: none;
