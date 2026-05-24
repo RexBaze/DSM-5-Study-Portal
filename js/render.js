@@ -238,57 +238,126 @@ function renderContent() {
 }
 
 // ============================================================
-// SEARCH
+// SEARCH — ranked / scored
 // ============================================================
+// Each disorder accumulates a relevance score; results are sorted high-to-low.
+// Disorder name + drug exact-name matches rank highest; deep subcriterion
+// substring matches rank lowest. This pushes tangential mentions (e.g. "anxious
+// distress" specifier appearing in many disorders) below the disorders the
+// user is actually trying to find.
 function renderSearch(query) {
-  const q = query.toLowerCase();
-  const results = [];
+  const q = query.toLowerCase().trim();
+  if (q.length < 2) return '';
+  const escRe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const wordRe = new RegExp(`\\b${escRe}`, 'i');
+  const scored = [];
+
   for (const ch of DSM5_DATA.chapters) {
     for (const d of ch.disorders) {
+      let score = 0;
       let snippet = '';
-      let matches = false;
-      if (d.name.toLowerCase().includes(q)) { matches = true; snippet = d.name; }
+      const lname = d.name.toLowerCase();
+
+      // Disorder name
+      if (lname === q) score += 200;
+      else if (lname.startsWith(q)) score += 100;
+      else if (wordRe.test(lname)) score += 70;
+      else if (lname.includes(q)) score += 50;
+      if (score > 0) snippet = d.name;
+
+      // Disorder id (catches abbreviations like "mdd", "ocd", "ptsd")
+      const lid = d.id.toLowerCase().replace(/_/g, '');
+      if (lid === q) score += 80;
+      else if (lid.startsWith(q)) score += 40;
+
+      // ICD code
+      if (d.code && d.code.toLowerCase().includes(q)) {
+        score += 30;
+        if (!snippet) snippet = `${d.code} · ${d.name}`;
+      }
+
+      // Criteria title / text / subcriteria
       for (const cr of d.criteria) {
-        if (cr.title.toLowerCase().includes(q) || cr.text.toLowerCase().includes(q)) {
-          matches = true;
+        const lt = cr.title.toLowerCase();
+        const ltx = cr.text.toLowerCase();
+        if (lt.includes(q)) {
+          score += wordRe.test(lt) ? 25 : 15;
+          if (!snippet) snippet = cr.title;
+        } else if (ltx.includes(q)) {
+          score += wordRe.test(ltx) ? 12 : 8;
           if (!snippet) snippet = cr.title;
         }
         if (cr.subcriteria) {
           for (const s of cr.subcriteria) {
-            if (s.text.toLowerCase().includes(q)) {
-              matches = true;
-              if (!snippet) snippet = s.text.substring(0, 120) + '...';
+            const lst = s.text.toLowerCase();
+            if (lst.includes(q)) {
+              score += wordRe.test(lst) ? 8 : 5;
+              if (!snippet) snippet = s.text.length > 120 ? s.text.substring(0, 120) + '…' : s.text;
             }
           }
         }
       }
-      // Match generic and brand medication names too
+
+      // Specifiers
+      if (d.specifiers) {
+        for (const sp of d.specifiers) {
+          if (sp.toLowerCase().includes(q)) {
+            score += 8;
+            if (!snippet) snippet = `Specifier: ${sp}`;
+          }
+        }
+      }
+
+      // Medications (generic, brand, drug class name)
       const meds = (typeof MEDICATIONS !== 'undefined') ? MEDICATIONS[d.id] : null;
       if (meds && meds.classes) {
         for (const cls of meds.classes) {
+          if (cls.name.toLowerCase().includes(q)) {
+            score += 25;
+            if (!snippet) snippet = `${cls.name} — drug class`;
+          }
           for (const drug of cls.drugs) {
-            const hit = drug.generic.toLowerCase().includes(q)
-              || (drug.brand && drug.brand.some(b => b.toLowerCase().includes(q)));
-            if (hit) {
-              matches = true;
-              if (!snippet) snippet = `${drug.generic}${drug.brand && drug.brand.length ? ' (' + drug.brand.join(', ') + ')' : ''} — ${cls.name}`;
+            const lg = drug.generic.toLowerCase();
+            let drugMatch = 0;
+            if (lg === q) drugMatch = 60;
+            else if (lg.includes(q)) drugMatch = wordRe.test(lg) ? 30 : 18;
+            if (drug.brand) {
+              for (const b of drug.brand) {
+                const lb = b.toLowerCase();
+                if (lb === q) drugMatch = Math.max(drugMatch, 60);
+                else if (lb.includes(q)) drugMatch = Math.max(drugMatch, wordRe.test(lb) ? 30 : 18);
+              }
+            }
+            if (drugMatch > 0) {
+              score += drugMatch;
+              if (!snippet) {
+                snippet = `${drug.generic}${drug.brand && drug.brand.length ? ' (' + drug.brand.join(', ') + ')' : ''} — ${cls.name}`;
+              }
             }
           }
         }
       }
-      if (matches) {
-        const hl = snippet.replace(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'), '<span class="hl">$1</span>');
-        results.push({ d, ch, snippet: hl });
+
+      if (score > 0) {
+        scored.push({ d, ch, snippet: snippet || d.name, score });
       }
     }
   }
-  if (!results.length) return `<div class="search-results"><div class="sr-empty">No results found for "<strong>${query}</strong>"</div></div>`;
-  let html = `<div class="search-results"><div class="sec-label">${results.length} result${results.length !== 1 ? 's' : ''} for "${query}"</div>`;
-  for (const r of results) {
+
+  scored.sort((a, b) => b.score - a.score || a.d.name.localeCompare(b.d.name));
+
+  if (!scored.length) {
+    return `<div class="search-results"><div class="sr-empty">No results found for "<strong>${query}</strong>"</div></div>`;
+  }
+
+  const hlRe = new RegExp(`(${escRe})`, 'gi');
+  let html = `<div class="search-results"><div class="sec-label">${scored.length} result${scored.length !== 1 ? 's' : ''} for "${query}"</div>`;
+  for (const r of scored) {
+    const hl = r.snippet.replace(hlRe, '<span class="hl">$1</span>');
     html += `<div class="sr-item" onclick="selectDisorder('${r.d.id}')">
       <div class="sr-disorder">${r.d.name}</div>
       <div class="sr-chapter">${r.ch.name}</div>
-      <div class="sr-snippet">${r.snippet}</div>
+      <div class="sr-snippet">${hl}</div>
     </div>`;
   }
   return html + '</div>';

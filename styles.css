@@ -420,9 +420,53 @@ body {
 }
 .med-link:hover { color: var(--accent); opacity: 1; }
 @media (max-width: 768px) {
-  .med-table { table-layout: auto; }
-  .med-table th:first-child { width: auto; }
-  .med-table td { font-size: 14px; padding: 11px 8px 11px 0; }
+  /* Vertical stack: generic on top, brand on its own line, link floats top-right */
+  .med-table,
+  .med-table thead,
+  .med-table tbody,
+  .med-table tr,
+  .med-table td,
+  .med-table th {
+    display: block;
+    width: 100%;
+  }
+  .med-table thead { display: none; }
+  .med-table tbody tr {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .med-table tbody tr:last-child { border-bottom: none; }
+  .med-table tbody tr:hover td { background: transparent; }
+  .med-table td {
+    border: none;
+    padding: 2px 36px 2px 0;
+    font-size: 15px;
+  }
+  .med-col-generic {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .med-col-brand {
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .med-col-brand::before {
+    content: 'Brand: ';
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-right: 4px;
+  }
+  .med-col-link {
+    position: absolute !important;
+    top: 8px !important;
+    right: 0 !important;
+    width: auto !important;
+    padding: 0 !important;
+  }
 }
 
 /* Card depth — subtle shadow visible in light theme, none in dark */
