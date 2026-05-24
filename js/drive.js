@@ -13,7 +13,7 @@
 // JavaScript origin). The Client ID is NOT a secret — it ships
 // in the browser by design.
 const Drive = {
-  CLIENT_ID: 'PASTE_YOUR_OAUTH_CLIENT_ID_HERE.apps.googleusercontent.com',
+  CLIENT_ID: '190967691329-7i30lpjqjvge563ul1aqnkb3ihhlojed.apps.googleusercontent.com',
   SCOPE: 'https://www.googleapis.com/auth/drive.appdata',
   FILE_NAME: 'progress.json',
   PUSH_DEBOUNCE_MS: 4000,
